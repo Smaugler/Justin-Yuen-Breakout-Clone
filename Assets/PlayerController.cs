@@ -66,16 +66,16 @@ public class PlayerController : MonoBehaviour
         if(!BallLaunched)
         {
             Ball.transform.position = Vector3.Lerp(Ball.transform.position, new Vector3(Paddle.transform.position.x, Paddle.transform.position.y + 1.0f, 0.0f), Time.deltaTime * 10.0f);
-
-            //Ball.transform.position = new Vector3(Paddle.transform.position.x, Paddle.transform.position.y + 1.0f, 0.0f);
         }
 
         if(!BallLaunched && Input.GetKey(KeyCode.Space))
         {
             BallLaunched = true;
 
-            float xcomponent = Mathf.Cos(0.0f * Mathf.PI / 180) * LaunchStrength;
-            float ycomponent = Mathf.Sin(0.0f * Mathf.PI / 180) * LaunchStrength;
+            float RandomAngle = Random.Range(0.0f - (90.0f * 0.5f), 0 + (90.0f * 0.5f));
+
+            float xcomponent = Mathf.Cos(RandomAngle * Mathf.PI / 180) * LaunchStrength;
+            float ycomponent = Mathf.Sin(RandomAngle * Mathf.PI / 180) * LaunchStrength;
 
             BallBody.AddForce(ycomponent, xcomponent, 0);
         }
