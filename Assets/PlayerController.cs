@@ -17,6 +17,10 @@ public class PlayerController : MonoBehaviour
     [Range(0.0f, 1000.0f)]
     private float LaunchStrength = 500.0f;
 
+    [SerializeField]
+    [Range(0.0f, 135.0f)]
+    private float LaunchAngleRange = 90.0f;
+
     [SerializeField][Range(0.0f, 0.75f)]
     private float SmoothMovement = 0.1f;
 
@@ -72,7 +76,7 @@ public class PlayerController : MonoBehaviour
         {
             BallLaunched = true;
 
-            float RandomAngle = Random.Range(0.0f - (90.0f * 0.5f), 0 + (90.0f * 0.5f));
+            float RandomAngle = Random.Range(0.0f - (LaunchAngleRange * 0.5f), 0 + (LaunchAngleRange * 0.5f));
 
             float xcomponent = Mathf.Cos(RandomAngle * Mathf.PI / 180) * LaunchStrength;
             float ycomponent = Mathf.Sin(RandomAngle * Mathf.PI / 180) * LaunchStrength;
@@ -86,5 +90,23 @@ public class PlayerController : MonoBehaviour
         BallLaunched = false;
         Ball.transform.position = new Vector3(Paddle.transform.position.x, Paddle.transform.position.y + 1.0f, 0.0f);
         BallBody.velocity = Vector3.zero;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        float xMinComponent = Mathf.Cos((((LaunchAngleRange + 180.0f) * 0.5f)) * Mathf.PI / 180) * 2.0f;
+        float yMinComponent = Mathf.Sin((((LaunchAngleRange + 180.0f) * 0.5f)) * Mathf.PI / 180) * 2.0f;
+
+        float xMaxComponent = Mathf.Cos((0.0f - ((LaunchAngleRange - 180.0f) * 0.5f)) * Mathf.PI / 180) * 2.0f;
+        float yMaxComponent = Mathf.Sin((0.0f - ((LaunchAngleRange - 180.0f) * 0.5f)) * Mathf.PI / 180) * 2.0f;
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(Ball.transform.position, Ball.transform.position + (new Vector3(xMinComponent, yMinComponent, 0.0f)));
+        Gizmos.DrawLine(Ball.transform.position, Ball.transform.position + (new Vector3(xMaxComponent, yMaxComponent, 0.0f)));
+    }
+
+    private void OnDrawGizmos()
+    {
+
     }
 }
