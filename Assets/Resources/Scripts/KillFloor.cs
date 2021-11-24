@@ -9,7 +9,7 @@ public class KillFloor : MonoBehaviour
         // Reset Ball
         if(collision.transform.tag == "Ball")
         {
-            collision.transform.parent.GetComponent<PlayerController>().ResetBall();
+            collision.transform.parent.GetComponent<PaddleController>().ResetBall();
         }
     }
 }

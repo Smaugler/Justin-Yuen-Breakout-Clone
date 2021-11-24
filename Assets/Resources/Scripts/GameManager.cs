@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI ScoreText;
 
-    private PlayerController Player;
+    private PaddleController Player;
     private int Score = 0;
     private int BrickCount = 0;
 
@@ -126,7 +126,7 @@ public class GameManager : MonoBehaviour
         {
             // Instantiate player and get reference
             GameObject PlayerObject = Instantiate(PlayerPrefab, new Vector3(0.0f, -ScreenToWorld.y + 0.5f, 0.0f), Quaternion.identity);
-            Player = PlayerObject.GetComponent<PlayerController>();
+            Player = PlayerObject.GetComponent<PaddleController>();
         }
 
         // Reset player ball and paddle state
