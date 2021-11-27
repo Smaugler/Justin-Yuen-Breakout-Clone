@@ -26,7 +26,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField]
     private TextMeshProUGUI ScoreText;
 
-    [SyncVar]
+    [SyncVar(hook = nameof(UpdateScore))]
     private int Score = 0;
 
     [SyncVar]
@@ -113,6 +113,15 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    void UpdateScore(int _iOldScore, int _iNewScore)
+    {
+        // Update Score
+        if (ScoreText)
+        {
+            ScoreText.text = "Score: " + _iNewScore.ToString();
+        }
+    }
+
     /// <summary>
     /// Brick Is Destroyed
     /// </summary>
@@ -132,12 +141,6 @@ public class GameManager : NetworkBehaviour
             Destroy(_Brick);
         }
 
-        // Update Score
-        if(ScoreText)
-        {
-            ScoreText.text = "Score: " + Score.ToString();
-        }
-
         // Check if all bricks are destroyed
         if (BrickCount <= 0)
         {
@@ -148,7 +151,7 @@ public class GameManager : NetworkBehaviour
                 _Player.ResetBall();
             }
 
-            ResetBricks(true);
+            ResetBricks();
         }
     }
 }
