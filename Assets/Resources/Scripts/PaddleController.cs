@@ -33,10 +33,21 @@ public class PaddleController : MonoBehaviour
     private Vector3 v3RefVelocity = Vector3.zero;
     private bool BallLaunched = false;
 
+    private void Awake()
+    {
+        Paddle.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+    }
+
     private void FixedUpdate()
     {
         MovePaddle();
         UpdateBall();
+
+        // Reset Key
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetBall();
+        }
     }
 
     /// <summary>
@@ -105,14 +116,8 @@ public class PaddleController : MonoBehaviour
     /// Reset Ball State
     /// </summary>
     /// <param name="_bResetPaddle">Reset Paddle State</param>
-    public void ResetBall(bool _bResetPaddle = false)
+    public void ResetBall()
     {
-        // Resets Paddle velocity and position
-        if (_bResetPaddle)
-        {
-            Paddle.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
-        }
-
         // Reset Ball velocity, position and launch state
         BallLaunched = false;
         BallBody.velocity = Vector3.zero;

@@ -44,7 +44,11 @@ public class GameManager : MonoBehaviour
         }
 
         ResetBricks();
-        ResetPlayer();
+
+        Vector3 ScreenToWorld = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth, Camera.main.pixelHeight, 0.0f));
+
+        // Instantiate player and get reference
+        GameObject PlayerObject = Instantiate(PlayerPrefab, new Vector3(0.0f, -ScreenToWorld.y + 0.5f, 0.0f), Quaternion.identity);
     }
 
     /// <summary>
@@ -114,36 +118,6 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Reset Player States
-    /// </summary>
-    /// <param name="_bResetPaddle">Reset Player's Paddle</param>
-    public void ResetPlayer(bool _bResetPaddle = false)
-    {
-        Vector3 ScreenToWorld = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth, Camera.main.pixelHeight, 0.0f));
-
-        // If there's no reference to player controller
-        if(!Player)
-        {
-            // Instantiate player and get reference
-            GameObject PlayerObject = Instantiate(PlayerPrefab, new Vector3(0.0f, -ScreenToWorld.y + 0.5f, 0.0f), Quaternion.identity);
-            Player = PlayerObject.GetComponent<PaddleController>();
-        }
-
-        // Reset player ball and paddle state
-        Player.ResetBall(_bResetPaddle);
-    }
-
-    private void Update()
-    {
-        // Reset Key
-        if(Input.GetKeyDown(KeyCode.R))
-        {
-            ResetBricks(true);
-            ResetPlayer(true);
-        }
-    }
-
-    /// <summary>
     /// Brick Is Destroyed
     /// </summary>
     public void DestroyedBrick()
@@ -161,6 +135,13 @@ public class GameManager : MonoBehaviour
         // Check if all bricks are destroyed
         if (BrickCount <= 0)
         {
+            PaddleController[] lPlayers = GameObject.FindObjectsOfType<PaddleController>();
+
+            foreach (PaddleController _Player in lPlayers)
+            {
+                _Player.ResetBall();
+            }
+
             ResetBricks(true);
         }
     }

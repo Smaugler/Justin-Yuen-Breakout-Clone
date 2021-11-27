@@ -327,7 +327,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BrickRows: 5
-  BrickColumns: 10
+  BrickColumns: 1
   lLayerColors: []
   BrickPrefab: {fileID: 6792276185084897616, guid: c21a441f90d55874887d57cc559533ad, type: 3}
   PlayerPrefab: {fileID: 4577354621791178569, guid: 4fd5b92ed01afad489450b4c5282fc4b, type: 3}
