@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class PaddleController : MonoBehaviour
+public class PaddleController : NetworkBehaviour
 {
     [SerializeField]
-    private Rigidbody BallBody, PaddleBody;
+    private Rigidbody BallBody;
 
     [SerializeField]
     private BoxCollider PaddleCollider;
@@ -35,6 +36,10 @@ public class PaddleController : MonoBehaviour
 
     private void Awake()
     {
+        Vector3 ScreenToWorld = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth, Camera.main.pixelHeight, 0.0f));
+
+        transform.position = new Vector3(0.0f, -ScreenToWorld.y + 0.25f, 0.0f);
+
         Paddle.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
     }
 
@@ -49,8 +54,11 @@ public class PaddleController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        MovePaddle();
-        UpdateBall();
+        if(isLocalPlayer)
+        {
+            MovePaddle();
+            UpdateBall();
+        }
     }
 
     /// <summary>
