@@ -7,7 +7,7 @@ public class GameNetwork : NetworkManager
 {
     public override void OnStartServer()
     {
-
+        
     }
 
     public override void OnServerDisconnect(NetworkConnection conn)
@@ -17,7 +17,7 @@ public class GameNetwork : NetworkManager
 
     public override void OnClientConnect(NetworkConnection conn)
     {
-        
+        GameManager.GetGameManager().ResetBricks();
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)
@@ -27,6 +27,6 @@ public class GameNetwork : NetworkManager
 
     public override void OnServerReady(NetworkConnection conn)
     {
-        GameManager.GetGameManager().ResetBricks();
+        
     }
 }

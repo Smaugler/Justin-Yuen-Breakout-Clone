@@ -13,14 +13,12 @@ public class GameManager : NetworkBehaviour
     [SerializeField][Range(1, 100)]
     private int BrickRows = 5, BrickColumns = 10;
 
-    [SerializeField]
+    [SerializeField][SyncVar]
     private List<Color> lLayerColors = new List<Color>();
+    public List<Color> GetLayerColor() { return lLayerColors; }
 
     [SerializeField]
     private GameObject BrickPrefab;
-
-    [SerializeField]
-    private Shader BrickShader;
 
     [SerializeField]
     private GameObject BrickParent;
@@ -96,22 +94,17 @@ public class GameManager : NetworkBehaviour
                 lLayerColors.Add(new Color(Random.Range(0.5f, 0.85f), Random.Range(0.5f, 0.85f), Random.Range(0.5f, 0.85f)));
             }
 
-            // Create new material with color of layer
-            Material LayerMaterial = new Material(BrickShader);
-            LayerMaterial.color = lLayerColors[i];
-
             for (int j = 0; j < BrickColumns; j++)
             {
                 // Instantiate brick
                 GameObject BrickObject = Instantiate(BrickPrefab, BrickParent.transform);
                 MeshRenderer BrickRenderer = BrickObject.GetComponent<MeshRenderer>();
 
+                BrickObject.GetComponent<Brick>().SetLayer(i);
+
                 // Set size and position
                 BrickObject.transform.localScale = new Vector3(BrickWidth - 0.05f, BrickHeight - 0.05f, 1.0f);
                 BrickObject.transform.localPosition = new Vector3((j * BrickWidth) - ScreenToWorld.x + (BrickWidth * 0.5f), (i * BrickHeight) + (BrickHeight * 0.5f), 0.0f);
-
-                // Set material
-                BrickRenderer.material = LayerMaterial;
 
                 NetworkServer.Spawn(BrickObject);
 
