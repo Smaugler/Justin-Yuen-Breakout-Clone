@@ -38,16 +38,19 @@ public class PaddleController : MonoBehaviour
         Paddle.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        MovePaddle();
-        UpdateBall();
-
         // Reset Key
         if (Input.GetKeyDown(KeyCode.R))
         {
             ResetBall();
         }
+    }
+
+    private void FixedUpdate()
+    {
+        MovePaddle();
+        UpdateBall();
     }
 
     /// <summary>
