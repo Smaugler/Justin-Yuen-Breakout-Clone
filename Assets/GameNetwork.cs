@@ -10,23 +10,19 @@ public class GameNetwork : NetworkManager
         
     }
 
-    public override void OnServerDisconnect(NetworkConnection conn)
+    public override void OnServerDisconnect(NetworkConnection _Conn)
     {
 
     }
 
-    public override void OnClientConnect(NetworkConnection conn)
+    public override void OnClientConnect(NetworkConnection _Conn)
     {
+        // Reset bricks in the scene when client connects
         GameManager.GetGameManager().ResetBricks();
     }
 
-    public override void OnClientDisconnect(NetworkConnection conn)
+    public override void OnClientDisconnect(NetworkConnection _Conn)
     {
 
-    }
-
-    public override void OnServerReady(NetworkConnection conn)
-    {
-        
     }
 }
