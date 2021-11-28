@@ -329,8 +329,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0
-  BrickRows: 5
-  BrickColumns: 2
+  iBrickRows: 5
+  iBrickColumns: 10
   lLayerColors: []
   BrickPrefab: {fileID: 6792276185084897616, guid: c21a441f90d55874887d57cc559533ad, type: 3}
   BrickParent: {fileID: 306507134}

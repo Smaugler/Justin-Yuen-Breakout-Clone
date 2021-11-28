@@ -49,10 +49,7 @@ public class PaddleController : NetworkBehaviour
 		// Reset Key
 		if (Input.GetKeyDown(KeyCode.R) && isLocalPlayer && bBallLaunched)
 		{
-			// Reset Ball velocity, position and launch state
-			bBallLaunched = false;
-			BallBody.velocity = Vector3.zero;
-			Ball.transform.position = new Vector3(Paddle.transform.position.x, Paddle.transform.position.y + 1.0f, 0.0f);
+			LocalResetBall();
 		}
 	}
 
@@ -151,7 +148,28 @@ public class PaddleController : NetworkBehaviour
 		Ball.transform.position = new Vector3(Paddle.transform.position.x, Paddle.transform.position.y + 1.0f, 0.0f);
 	}
 
-	private void OnDrawGizmosSelected()
+	/// <summary>
+	/// Reset Ball In Local Network
+	/// </summary>
+	public void LocalResetBall()
+	{
+		if (!bBallLaunched)
+		{
+			return;
+		}
+
+		// Reset Ball velocity, position and launch state
+		bBallLaunched = false;
+		BallBody.velocity = Vector3.zero;
+		Ball.transform.position = new Vector3(Paddle.transform.position.x, Paddle.transform.position.y + 1.0f, 0.0f);
+	}
+
+    private void OnPlayerDisconnected()
+    {
+		Destroy(gameObject);
+    }
+
+    private void OnDrawGizmosSelected()
 	{
 		// Get the x and y component of the minimum angle of launch
 		float xMinComponent = Mathf.Cos((((fLaunchAngleRange + 180.0f) * 0.5f)) * Mathf.PI / 180) * 2.0f;

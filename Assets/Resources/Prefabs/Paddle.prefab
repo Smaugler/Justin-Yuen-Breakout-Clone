@@ -180,10 +180,10 @@ MonoBehaviour:
   PaddleCollider: {fileID: 8449583492463594940}
   Ball: {fileID: 4577354621046666723}
   Paddle: {fileID: 4577354621895416461}
-  MovementSpeed: 0.15
-  LaunchStrength: 500
-  LaunchAngleRange: 90
-  SmoothMovement: 0.1
+  fMovementSpeed: 0.15
+  fLaunchStrength: 500
+  fLaunchAngleRange: 90
+  fSmoothMovement: 0.1
 --- !u!114 &7282903473371900633
 MonoBehaviour:
   m_ObjectHideFlags: 0

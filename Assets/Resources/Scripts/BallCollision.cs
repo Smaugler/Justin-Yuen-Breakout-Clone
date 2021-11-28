@@ -19,7 +19,7 @@ public class BallCollision : MonoBehaviour
 			if (GameManager.GetGameManager().GetBrickCount() - 1 <= 0)
 			{
 				// Get all reference to players
-				PaddleController[] lPlayers = GameObject.FindObjectsOfType<PaddleController>();
+				PaddleController[] lPlayers = FindObjectsOfType<PaddleController>();
 
 				// Reset ball
 				foreach (PaddleController _Player in lPlayers)
