@@ -2,24 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Mirror;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     // Singleton reference
     private static GameManager GameManagerSingleton = null;
     public static GameManager GetGameManager() { return GameManagerSingleton; }
 
     [SerializeField][Range(1, 100)]
-    private int BrickRows = 5, BrickColumns = 10;
+    private int iBrickRows = 5, iBrickColumns = 10;
 
-    [SerializeField]
+    [SerializeField][SyncVar]
     private List<Color> lLayerColors = new List<Color>();
+    public List<Color> GetLayerColor() { return lLayerColors; }
 
     [SerializeField]
-    private GameObject BrickPrefab, PlayerPrefab;
-
-    [SerializeField]
-    private Shader BrickShader;
+    private GameObject BrickPrefab;
 
     [SerializeField]
     private GameObject BrickParent;
@@ -27,9 +26,12 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI ScoreText;
 
-    private PaddleController Player;
-    private int Score = 0;
-    private int BrickCount = 0;
+    [SyncVar(hook = nameof(UpdateScore))]
+    private int iScore = 0;
+
+    [SyncVar]
+    private int iBrickCount = 0;
+    public int GetBrickCount() { return iBrickCount; }
 
     private void Awake()
     {
@@ -38,17 +40,11 @@ public class GameManager : MonoBehaviour
         else if (GameManagerSingleton != this)
             Destroy(gameObject);
 
+        // Set score text
         if (ScoreText)
         {
-            ScoreText.text = "Score: " + Score.ToString();
+            ScoreText.text = "Score: " + iScore.ToString();
         }
-
-        ResetBricks();
-
-        Vector3 ScreenToWorld = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth, Camera.main.pixelHeight, 0.0f));
-
-        // Instantiate player and get reference
-        GameObject PlayerObject = Instantiate(PlayerPrefab, new Vector3(0.0f, -ScreenToWorld.y + 0.5f, 0.0f), Quaternion.identity);
     }
 
     /// <summary>
@@ -57,19 +53,22 @@ public class GameManager : MonoBehaviour
     /// <param name="_bRandomizeLayerColors">Override And Forcefully Randomize Layer Colors</param>
     public void ResetBricks(bool _bRandomizeLayerColors = false)
     {
-        Vector3 ScreenToWorld = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth, Camera.main.pixelHeight, 0.0f));
+        // Reset bricks if this is server
+        if (!isServer)
+        {
+            return;
+        }
+
+        Vector3 v3ScreenToWorld = Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth, Camera.main.pixelHeight, 0.0f));
 
         // Get brick size based on screen size and layers and columns to spawn
-        float BrickWidth = ScreenToWorld.x / (BrickColumns * 0.5f);
-        float BrickHeight = ScreenToWorld.y / BrickRows;
-
-        // Set brick parent to the top of the screen view
-        BrickParent.transform.position = new Vector3(0.0f, ScreenToWorld.y, 0.0f);
+        float fBrickWidth = v3ScreenToWorld.x / (iBrickColumns * 0.5f);
+        float fBrickHeight = v3ScreenToWorld.y / iBrickRows;
 
         // Destroy any existing bricks
-        foreach (Transform child in BrickParent.transform)
+        foreach (Transform _Child in BrickParent.transform)
         {
-            GameObject.Destroy(child.gameObject);
+            Destroy(_Child.gameObject);
         }
 
         // Randomize colors for brick layers
@@ -78,16 +77,17 @@ public class GameManager : MonoBehaviour
             lLayerColors.Clear();
 
             // Add random color for each row
-            for (int i = 0; i < BrickRows; i++)
+            for (int i = 0; i < iBrickRows; i++)
             {
                 lLayerColors.Add(new Color(Random.Range(0.5f, 0.85f), Random.Range(0.5f, 0.85f), Random.Range(0.5f, 0.85f)));
             }
         }
 
-        BrickCount = 0;
+        // Reset brick count
+        iBrickCount = 0;
 
         // Run through all rows/layers
-        for (int i = 0; i < BrickRows; i++)
+        for (int i = 0; i < iBrickRows; i++)
         {
             // If this row/layer doesn't have a color assigned
             if (i > lLayerColors.Count - 1)
@@ -95,54 +95,64 @@ public class GameManager : MonoBehaviour
                 lLayerColors.Add(new Color(Random.Range(0.5f, 0.85f), Random.Range(0.5f, 0.85f), Random.Range(0.5f, 0.85f)));
             }
 
-            // Create new material with color of layer
-            Material LayerMaterial = new Material(BrickShader);
-            LayerMaterial.color = lLayerColors[i];
-
-            for (int j = 0; j < BrickColumns; j++)
+            for (int j = 0; j < iBrickColumns; j++)
             {
                 // Instantiate brick
                 GameObject BrickObject = Instantiate(BrickPrefab, BrickParent.transform);
-                MeshRenderer BrickRenderer = BrickObject.GetComponent<MeshRenderer>();
+
+                BrickObject.GetComponent<Brick>().SetLayer(i);
 
                 // Set size and position
-                BrickObject.transform.localScale = new Vector3(BrickWidth - 0.05f, BrickHeight - 0.05f, 1.0f);
-                BrickObject.transform.localPosition = new Vector3((j * BrickWidth) - ScreenToWorld.x + (BrickWidth * 0.5f), (i * BrickHeight) - ScreenToWorld.y + (BrickHeight * 0.5f), 0.0f);
+                BrickObject.transform.localScale = new Vector3(fBrickWidth - 0.05f, fBrickHeight - 0.05f, 1.0f);
+                BrickObject.transform.localPosition = new Vector3((j * fBrickWidth) - v3ScreenToWorld.x + (fBrickWidth * 0.5f), (i * fBrickHeight) + (fBrickHeight * 0.5f), 0.0f);
 
-                // Set material
-                BrickRenderer.material = LayerMaterial;
+                // Spawn object in network
+                NetworkServer.Spawn(BrickObject);
 
-                BrickCount++;
+                iBrickCount++;
             }
+        }
+    }
+
+    /// <summary>
+    /// Score Hook That Updates Score Text On Change
+    /// </summary>
+    /// <param name="_iOldScore">The Previous Score Value</param>
+    /// <param name="_iNewScore">The New Score Value</param>
+    void UpdateScore(int _iOldScore, int _iNewScore)
+    {
+        // Update Score
+        if (ScoreText)
+        {
+            ScoreText.text = "Score: " + _iNewScore.ToString();
         }
     }
 
     /// <summary>
     /// Brick Is Destroyed
     /// </summary>
-    public void DestroyedBrick()
+    public void DestroyedBrick(GameObject _Brick = null)
     {
-        // Increase score and decrease brick count
-        Score += 100;
-        BrickCount -= 1;
-
-        // Update Score
-        if(ScoreText)
+        // Only destroy brick if this is server
+        if(!isServer)
         {
-            ScoreText.text = "Score: " + Score.ToString();
+            return;
+        }
+
+        // Increase score and decrease brick count
+        iScore += 100;
+        iBrickCount -= 1;
+
+        // Destroy brick object
+        if(_Brick)
+        {
+            Destroy(_Brick);
         }
 
         // Check if all bricks are destroyed
-        if (BrickCount <= 0)
+        if (iBrickCount <= 0)
         {
-            PaddleController[] lPlayers = GameObject.FindObjectsOfType<PaddleController>();
-
-            foreach (PaddleController _Player in lPlayers)
-            {
-                _Player.ResetBall();
-            }
-
-            ResetBricks(true);
+            ResetBricks();
         }
     }
 }

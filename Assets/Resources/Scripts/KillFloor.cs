@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class KillFloor : MonoBehaviour
 {
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision _Collision)
     {
         // Reset Ball
-        if(collision.transform.tag == "Ball")
+        if(_Collision.transform.tag == "Ball")
         {
-            collision.transform.parent.GetComponent<PaddleController>().ResetBall();
+            _Collision.transform.parent.GetComponent<PaddleController>().LocalResetBall();
         }
     }
 }
