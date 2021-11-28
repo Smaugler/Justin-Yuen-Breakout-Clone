@@ -45,16 +45,26 @@ public class GameManager : NetworkBehaviour
         {
             ScoreText.text = "Score: " + iScore.ToString();
         }
+
+        // Run through all rows/layers
+        for (int i = 0; i < iBrickRows; i++)
+        {
+            // If this row/layer doesn't have a color assigned
+            if (i > lLayerColors.Count - 1)
+            {
+                lLayerColors.Add(new Color(Random.Range(0.5f, 0.85f), Random.Range(0.5f, 0.85f), Random.Range(0.5f, 0.85f)));
+            }
+        }
     }
 
     /// <summary>
     /// Reset Bricks
     /// </summary>
     /// <param name="_bRandomizeLayerColors">Override And Forcefully Randomize Layer Colors</param>
-    public void ResetBricks(bool _bRandomizeLayerColors = false)
+    public void ResetBricks(bool _bOverrideReset = false, bool _bRandomizeLayerColors = false)
     {
         // Reset bricks if this is server
-        if (!isServer)
+        if (iBrickCount > 0 && !_bOverrideReset)
         {
             return;
         }
@@ -89,12 +99,6 @@ public class GameManager : NetworkBehaviour
         // Run through all rows/layers
         for (int i = 0; i < iBrickRows; i++)
         {
-            // If this row/layer doesn't have a color assigned
-            if (i > lLayerColors.Count - 1)
-            {
-                lLayerColors.Add(new Color(Random.Range(0.5f, 0.85f), Random.Range(0.5f, 0.85f), Random.Range(0.5f, 0.85f)));
-            }
-
             for (int j = 0; j < iBrickColumns; j++)
             {
                 // Instantiate brick
@@ -152,7 +156,7 @@ public class GameManager : NetworkBehaviour
         // Check if all bricks are destroyed
         if (iBrickCount <= 0)
         {
-            ResetBricks();
+            ResetBricks(true);
         }
     }
 }
