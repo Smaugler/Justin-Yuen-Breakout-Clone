@@ -42,6 +42,11 @@ public class PaddleController : NetworkBehaviour
 
 		// Set offset depending on client being host or not
 		transform.position = new Vector3(0.0f, -v3ScreenToWorld.y + ((isServer) ? 0.25f : 2.25f), 0.0f);
+
+		if(isServer)
+        {
+			GameManager.GetGameManager().ResetBricks();
+        }
 	}
 
     private void Update()
@@ -128,24 +133,6 @@ public class PaddleController : NetworkBehaviour
 			// Apply force to ball rigidbody
 			BallBody.AddForce(fYcomponent, fXComponent, 0);
 		}
-	}
-
-	/// <summary>
-	/// Reset Ball State
-	/// </summary>
-	/// <param name="_bResetPaddle">Reset Paddle State</param>
-	[ClientRpc]
-	public void ResetBall()
-	{
-		if(!bBallLaunched)
-		{
-			return;
-		}
-
-		// Reset Ball velocity, position and launch state
-		bBallLaunched = false;
-		BallBody.velocity = Vector3.zero;
-		Ball.transform.position = new Vector3(Paddle.transform.position.x, Paddle.transform.position.y + 1.0f, 0.0f);
 	}
 
 	/// <summary>

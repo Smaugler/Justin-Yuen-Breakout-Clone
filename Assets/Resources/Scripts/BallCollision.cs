@@ -24,7 +24,7 @@ public class BallCollision : MonoBehaviour
 				// Reset ball
 				foreach (PaddleController _Player in lPlayers)
 				{
-					_Player.ResetBall();
+					_Player.LocalResetBall();
 				}
 			}
 
